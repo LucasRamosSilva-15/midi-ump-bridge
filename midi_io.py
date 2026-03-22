@@ -1,7 +1,7 @@
 # importa a biblioteca mido para lidar com MIDI
 import mido
 
-def choose_input():
+def select_midi_input():
     """
     Lista as entradas MIDI disponíveis, permite ao usuário escolher uma
     e retorna a porta MIDI selecionada.
