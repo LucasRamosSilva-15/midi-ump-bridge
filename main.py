@@ -33,7 +33,7 @@ for msg in port:
             channel = msg.channel & 0x0F
             ump_msg = create_midi2_note_off(note, 0, channel=channel) # cria a mensagem UMP de Note Off usando a função do ump.py, passando a nota, velocity 0 e o canal.
             ump64 = (ump_msg[0] << 32) | ump_msg[1]
-
+            # imprime as informações da mensagem MIDI original (note off com velocity 0), o valor hexadecimal da mensagem UMP e decodifica a mensagem UMP para mostrar seus componentes.
             print(f"[NOTE OFF] Note: {msg.note}")
             print(f"UMP HEX: {hex(ump64)}")
             decode_ump(ump64)
