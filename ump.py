@@ -38,6 +38,22 @@ def create_midi2_note_off(note, velocity16=0, channel=0, group=0):
     )
 
     return word1, word2
+
+def create_midi2_pitch_bend(pitch32, channel=0, group=0):
+    mt = 0x4
+    status = 0xE  # Pitch Bend
+
+    word1 = (
+        (mt << 28) |
+        (group << 24) |
+        (status << 20) |
+        (channel << 16)
+    )
+
+    word2 = pitch32 & 0xFFFFFFFF
+
+    return word1, word2
+
 def decode_ump(ump64):
     # Para decodificar a mensagem UMP de 64 bits, precisamos extrair os dois words de 32 bits e depois interpretar os campos de acordo com o formato do MIDI 2.0.
     word1 = (ump64 >> 32) & 0xFFFFFFFF
