@@ -66,6 +66,14 @@ def decode_ump(ump64):
     # Para Word 2, a nota é um valor de 7 bits (0-127) e a velocity é um valor de 16 bits (0-65535). O campo de tipo de atributo é ignorado aqui, mas poderia ser extraído se necessário.
     note = (word2 >> 24) & 0xFF
     velocity = word2 & 0xFFFF
+    pitch = word2 & 0xFFFFFFFF  # Para mensagens de pitch bend, o valor de pitch é o valor completo de Word 2
     # Imprime os campos decodificados para verificar se a mensagem foi interpretada corretamente.
-    print(f"MT: {mt} | Group: {group} | Status: {status} | Channel: {channel}")
-    print(f"Note: {note} | Velocity: {velocity}")
+    if status == 0x9:
+        print(f" MT: {mt} | Group: {group} | Status: {status} (Note On) | Channel: {channel}")
+        print(f"Note: {note} | Velocity: {velocity}")
+    elif status == 0x8:
+        print(f" MT: {mt} | Group: {group} | Status: {status} (Note Off) | Channel: {channel}")
+        print(f"Note: {note} | Velocity: {velocity}")
+    elif status == 0xE:
+        print(f" MT: {mt} | Group: {group} | Status: {status} (Pitch Bend) | Channel: {channel}")
+        print(f"Pitch Bend Value: {pitch}")

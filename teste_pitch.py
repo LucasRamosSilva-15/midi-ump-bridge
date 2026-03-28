@@ -17,6 +17,6 @@ def test_pitch_bend():
     # Imprime as informações da mensagem MIDI original, o valor convertido e o valor hexadecimal da mensagem UMP, além de decodificar a mensagem UMP para mostrar seus componentes.
     print(f"Campo de pitch\n")
     print(f"[PITCH BEND] Pitch14: {test_msg.pitch} → Pitch32: {pitch32}")
-    print(f"UMP HEX: {hex(ump64)}")
+    print(f" PITCH BEND UMP HEX: {hex(ump64)}")
     print("Decodificando UMP...")
     decode_ump(ump64)
