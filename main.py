@@ -14,13 +14,20 @@ for msg in port:
         # acontece que em MIDI 1.0, um Note On com velocity 0 é interpretado como Note Off, então verificamos isso primeiro
         if msg.velocity > 0:
             # NOTE ON
-            v1 = msg.velocity # é o comando usado para receber a velocity da mensagem MIDI 1.0, que é um valor entre 0 e 127.
-            v2 = midi1_to_midi2_velocity(v1) & 0xFFFF # converte a velocity para MIDI 2.0 usando a função do converter.py e garante que seja um valor de 16 bits (0-65535).
-            note = msg.note & 0x7F # garante que a nota seja um valor de 7 bits (0-127), embora isso seja geralmente garantido pelo próprio mido.
-            channel = msg.channel & 0x0F # garante que o canal seja um valor de 4 bits (0-15), embora isso também seja geralmente garantido pelo mido.
+            # é o comando usado para receber a velocity da mensagem MIDI 1.0, que é um valor entre 0 e 127.
+            v1 = msg.velocity 
+            # converte a velocity para MIDI 2.0 usando a função do converter.py e garante que seja um valor de 16 bits (0-65535).
+            v2 = midi1_to_midi2_velocity(v1) & 0xFFFF 
+            # garante que a nota seja um valor de 7 bits (0-127), embora isso seja geralmente garantido pelo próprio mido.
+            note = msg.note & 0x7F 
+            # garante que o canal seja um valor de 4 bits (0-15), embora isso também seja geralmente garantido pelo mido.
+            channel = msg.channel & 0x0F 
 
-            ump_msg = create_midi2_note_on(note, v2, channel) # cria a mensagem UMP de Note On usando a função do ump.py, passando a nota, a velocity convertida e o canal.
-            ump64 = (ump_msg[0] << 32) | ump_msg[1] # combina os dois words da mensagem UMP em um único valor de 64 bits para facilitar a exibição e o debug.
+            # cria a mensagem UMP de Note On usando a função do ump.py, passando a nota, a velocity convertida e o canal.
+            ump_msg = create_midi2_note_on(note, v2, channel) 
+            # combina os dois words da mensagem UMP em um único valor de 64 bits para facilitar a exibição e o debug.
+            ump64 = (ump_msg[0] << 32) | ump_msg[1] 
+
             # imprime as informações da mensagem MIDI original, a velocity convertida e o valor hexadecimal da mensagem UMP, além de decodificar a mensagem UMP para mostrar seus componentes.
             print(f"[NOTE ON] Note: {msg.note} | V1: {v1} → V2: {v2}")
             print(f"UMP HEX: {hex(ump64)}")
