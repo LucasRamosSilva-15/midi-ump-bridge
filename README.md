@@ -5,6 +5,8 @@ que é usando no MIDI 2 UMP quando ele receber valores do padrão MIDI 1
 
 é um projeto que demonstrar a logica de manipulação de bits e a forma que o protocolo MIDI mostrar as mensagens em hexadecimal
 
+utiliza a biblioteca mido
+
 O MIDI 2 UMP ele é compatível com MIDI 1 e faz uma conversão de valores
 
 Foi feito com objetivo de demonstrar as diferenças e as vantagens do MIDI 2 UMP
