@@ -1,12 +1,44 @@
-Projeto Do Meu TCC.
+# Projeto de TCC - Conversão MIDI 1.0 para MIDI 2.0 (UMP)
 
-É um programa que demonstrar a lógica de conversão de um padrão MIDI 1 (1983) para um padrão MIDI 2 UMP (2020), 
-que é usando no MIDI 2 UMP quando ele receber valores do padrão MIDI 1
+Este projeto tem como objetivo demonstrar, na prática, a conversão de mensagens do protocolo MIDI 1.0 (1983) para o formato MIDI 2.0 Universal MIDI Packet (UMP), introduzido em 2020.
 
-é um projeto que demonstrar a logica de manipulação de bits e a forma que o protocolo MIDI mostrar as mensagens em hexadecimal
+O sistema captura mensagens MIDI em tempo real, realiza a conversão dos dados (como velocity e pitch bend) e gera as mensagens no formato UMP, permitindo a visualização e análise em hexadecimal.
 
-utiliza a biblioteca mido
+## Objetivo
 
-O MIDI 2 UMP ele é compatível com MIDI 1 e faz uma conversão de valores
+Implementar e demonstrar a lógica de conversão entre os padrões MIDI 1.0 e MIDI 2.0, mostrando:
 
-Foi feito com objetivo de demonstrar as diferenças e as vantagens do MIDI 2 UMP
+- Diferenças de resolução (7 bits vs 16/32 bits)
+- Estrutura das mensagens MIDI
+- Representação em nível de bits
+- Funcionamento do formato UMP
+
+## Justificativa
+
+Embora o padrão MIDI 2.0 já defina mecanismos de compatibilidade com MIDI 1.0, sua implementação prática não é trivial. Este projeto busca demonstra esse processo de forma clara, servindo como ferramenta de estudo e análise do protocolo.
+
+## Funcionalidades
+
+- Leitura de mensagens MIDI em tempo real
+- Conversão de velocity (MIDI 1 → MIDI 2)
+- Conversão de pitch bend (14 bits → 32 bits)
+- Geração de mensagens UMP
+- Exibição em formato hexadecimal
+- Decodificação das mensagens UMP
+
+## Tecnologias utilizadas
+
+- Python
+- Biblioteca Mido
+  
+## Equipamento utilizado
+
+- Teclado Arranjador Yamanha Psr E383
+
+## Observação
+
+O MIDI 2.0 mantém compatibilidade com o MIDI 1.0 por meio do formato UMP, permitindo a adaptação entre os dois padrões com maior precisão e expressividade.
+
+## Autor
+
+Lucas Ramos Silva
