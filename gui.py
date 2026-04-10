@@ -1,74 +1,117 @@
-import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QTextEdit, QLabel
+from PyQt6.QtWidgets import (QMainWindow, QVBoxLayout, QWidget, QTableWidget, 
+                             QTableWidgetItem, QProgressBar, QLabel, QHeaderView, QPushButton)
 from PyQt6.QtCore import QThread, pyqtSignal
-from midi_io import select_midi_input
-from converter import midi1_to_midi2_velocity, midi1_to_midi2_pitch, midi1_to_midi2_cc
-from ump import create_midi2_note_on, create_midi2_note_off, create_midi2_pitch_bend, create_midi2_control_change
+import converter
+import ump
 
 class MidiWorker(QThread):
-    message_received = pyqtSignal(str)
+    log_signal = pyqtSignal(dict)
+    pitch_signal = pyqtSignal(int)
 
     def __init__(self, port):
         super().__init__()
         self.port = port
+        self.last_note = 60 
 
     def run(self):
         for msg in self.port:
-            ump_msg = None
-            display_text = ""
-
-            if msg.type == 'note_on' and msg.velocity > 0:
-                v2 = midi1_to_midi2_velocity(msg.velocity)
-                ump_msg = create_midi2_note_on(msg.note, v2, msg.channel)
-                display_text = f"[NOTE ON] Note: {msg.note} | Vel: {v2}"
+            ump_msg = None 
+            original_str = "-"
             
+            if msg.type == 'note_on' and msg.velocity > 0:
+                self.last_note = msg.note
+                original_str = f"Vel: {msg.velocity}" # Captura o 0-127
+                v2 = converter.midi1_to_midi2_velocity(msg.velocity)
+                ump_msg = ump.create_midi2_note_on(msg.note, v2, msg.channel)
+                
             elif msg.type == 'note_off' or (msg.type == 'note_on' and msg.velocity == 0):
-                ump_msg = create_midi2_note_off(msg.note, 0, msg.channel)
-                display_text = f"[NOTE OFF] Note: {msg.note}"
-
+                original_str = f"Vel: {msg.velocity}"
+                v2 = converter.midi1_to_midi2_velocity(msg.velocity)
+                ump_msg = ump.create_midi2_note_off(msg.note, v2, msg.channel)
+                
             elif msg.type == 'pitchwheel':
-                p32 = midi1_to_midi2_pitch(msg.pitch)
-                ump_msg = create_midi2_pitch_bend(p32, msg.channel)
-                display_text = f"[PITCH] Value: {p32}"
+                original_str = f"Pitch: {msg.pitch}" # Captura o -8192 a +8191
+                p32 = converter.midi1_to_midi2_pitch(msg.pitch)
+                ump_msg = ump.create_midi2_pitch_bend(p32, msg.channel)
+                self.pitch_signal.emit(int((p32 / 0xFFFFFFFF) * 100))
 
             elif msg.type == 'control_change':
-                c32 = midi1_to_midi2_cc(msg.value)
-                ump_msg = create_midi2_control_change(msg.control, c32, msg.channel)
-                display_text = f"[CC] Control: {msg.control} | Value: {c32}"
+                original_str = f"Val: {msg.value}" # Captura o CC de 0-127
+                v32 = converter.midi1_to_midi2_32bit(msg.value)
+                ump_msg = ump.create_midi2_per_note_controller(
+                    self.last_note, msg.control, v32, msg.channel
+                )
 
             if ump_msg:
-                full_log = f"{display_text}\nUMP HEX: {hex(ump_msg.ump64)}\n" + "-"*30
-                self.message_received.emit(full_log)
+                data = ump_msg.analyze()
+                data["original"] = original_str
+                self.log_signal.emit(data)
+
 
 class MainWindow(QMainWindow):
     def __init__(self, port):
         super().__init__()
-        self.setWindowTitle("Tradutor MIDI 1.0 para MIDI 2.0 UMP")
-        self.setMinimumSize(500, 400)
-
-        self.layout = QVBoxLayout()
-        self.label = QLabel(f"Conectado em: {port.name}")
-        self.log_area = QTextEdit()
-        self.log_area.setReadOnly(True)
-
-        self.layout.addWidget(self.label)
-        self.layout.addWidget(self.log_area)
-
+        self.setWindowTitle("Analisador MIDI 2.0 UMP - TCC IFPB")
+        self.setMinimumSize(750, 450)
+        
+        layout = QVBoxLayout()
+        
+        self.table = QTableWidget(0, 6) 
+        self.table.setHorizontalHeaderLabels([
+            "Mensagem", "Ch", "Alvo", "Valor Original", "Valor Convertido", "Raw Words (UMP 64-bit)"
+        ])
+        
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
+        
+        self.bar = QProgressBar()
+        
+        self.btn_simular = QPushButton("Simular Pitch Bend (Teste de Software)")
+        self.btn_simular.clicked.connect(self.simular_pitch_bend)
+        
+        layout.addWidget(QLabel(f"Hardware Conectado: {port.name}"))
+        layout.addWidget(self.btn_simular) # Adiciona o botão na tela
+        layout.addWidget(QLabel("Resolução Pitch Bend (32-bit):"))
+        layout.addWidget(self.bar)
+        layout.addWidget(QLabel("Analisador de Pacotes UMP em Tempo Real:"))
+        layout.addWidget(self.table)
+        
         container = QWidget()
-        container.setLayout(self.layout)
+        container.setLayout(layout)
         self.setCentralWidget(container)
 
         self.worker = MidiWorker(port)
-        self.worker.message_received.connect(self.update_log)
+        self.worker.log_signal.connect(self.add_table_row)
+        self.worker.pitch_signal.connect(self.bar.setValue)
         self.worker.start()
 
-    def update_log(self, text):
-        self.log_area.append(text)
+    # NOVO: Função que injeta uma mensagem falsa diretamente na interface
+    def simular_pitch_bend(self):
+        val_midi1 = 2000 # Valor fixo de teste do seu teste_pitch.py
+        p32 = converter.midi1_to_midi2_pitch(val_midi1)
+        ump_msg = ump.create_midi2_pitch_bend(p32, 0)
+        
+        # 1. Atualiza a barra de progresso manualmente
+        self.bar.setValue(int((p32 / 0xFFFFFFFF) * 100))
+        
+        # 2. Formata a mensagem para a tabela
+        data = ump_msg.analyze()
+        data["original"] = f"Pitch: {val_midi1} (Simulado)"
+        
+        # 3. Manda para a tabela
+        self.add_table_row(data)
 
-if __name__ == "__main__":
-    port = select_midi_input()
-    if port:
-        app = QApplication(sys.argv)
-        window = MainWindow(port)
-        window.show()
-        sys.exit(app.exec())
+    def add_table_row(self, data):
+        row_pos = self.table.rowCount()
+        self.table.insertRow(row_pos)
+        
+        self.table.setItem(row_pos, 0, QTableWidgetItem(data.get("type", "")))
+        self.table.setItem(row_pos, 1, QTableWidgetItem(str(data.get("channel", ""))))
+        self.table.setItem(row_pos, 2, QTableWidgetItem(data.get("target", "")))
+        self.table.setItem(row_pos, 3, QTableWidgetItem(data.get("original", ""))) 
+        self.table.setItem(row_pos, 4, QTableWidgetItem(data.get("value", "")))
+        
+        raw_words = f"{data.get('raw_w1', '')} | {data.get('raw_w2', '')}"
+        self.table.setItem(row_pos, 5, QTableWidgetItem(raw_words))
+        
+        self.table.scrollToBottom()

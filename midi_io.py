@@ -2,19 +2,15 @@ import mido
 
 def select_midi_input():
     inputs = mido.get_input_names()
-
-    if not inputs:
-        print("No MIDI input devices found.")
-        return None
-
-    print("Available MIDI input devices:")
+    if not inputs: return None
+    
+    print("\n--- Entradas Disponíveis ---")
     for i, name in enumerate(inputs):
         print(f"{i}: {name}")
-
-    choice = int(input("Escolha a entrada pelo número: "))
-
-    if 0 <= choice < len(inputs):
+    
+    try:
+        choice = int(input("Escolha o número da porta: "))
         return mido.open_input(inputs[choice])
-    else:
-        print("Invalid choice.")
+    except (ValueError, IndexError):
+        print("Seleção inválida.")
         return None

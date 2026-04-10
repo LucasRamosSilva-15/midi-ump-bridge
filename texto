@@ -1,0 +1,169 @@
+(converter.py:)
+def midi1_to_midi2_velocity(v: int) -> int:
+    return int((v / 127) * 65535)
+
+def midi1_to_midi2_pitch(pitch14: int) -> int:
+    pitch14_unsigned = pitch14 + 8192
+    return int((pitch14_unsigned / 16383) * 0xFFFFFFFF)
+
+def midi1_to_midi2_32bit(value7: int) -> int:
+    return int((value7 / 127) * 0xFFFFFFFF)
+(teste_pitch.py:)
+from converter import midi1_to_midi2_pitch
+from ump import create_midi2_pitch_bend
+
+def test_pitch_bend():
+    print("\n--- Iniciando Teste de Conversão ---")
+    val_midi1 = 2000
+    p32 = midi1_to_midi2_pitch(val_midi1)
+    ump = create_midi2_pitch_bend(p32)
+    
+    print(f"Entrada: {val_midi1} (14-bit)")
+    print(f"Saída: {p32} (32-bit)")
+    print(f"UMP HEX: {hex(ump.ump64)}")
+(ump.py:)
+class UMPMessage:
+    def __init__(self, word1, word2=0):
+        self.word1 = word1
+        self.word2 = word2
+
+    @property
+    def ump64(self):
+        return (self.word1 << 32) | self.word2
+
+    def display(self):
+        mt = (self.word1 >> 28) & 0xF
+        status = hex((self.word1 >> 20) & 0xF)
+        # Formatação hex padronizada para 8 dígitos (32-bit)
+        return (f"MT: {mt} | Status: {status} | "
+                f"W1: 0x{self.word1:08X} | W2: 0x{self.word2:08X}")
+
+def create_midi2_note_on(note, vel16, channel=0, group=0):
+    word1 = (0x4 << 28) | (group << 24) | (0x9 << 20) | (channel << 16)
+    word2 = (note << 24) | vel16
+    return UMPMessage(word1, word2)
+
+def create_midi2_pitch_bend(pitch32, channel=0, group=0):
+    word1 = (0x4 << 28) | (group << 24) | (0xE << 20) | (channel << 16)
+    return UMPMessage(word1, pitch32)
+
+def create_midi2_control_change(index, val32, channel=0, group=0):
+    # CORREÇÃO TCC: Index vai no Word 1 (bits 8-15)
+    word1 = (0x4 << 28) | (group << 24) | (0xB << 20) | (channel << 16) | (index << 8)
+    return UMPMessage(word1, val32)
+
+def create_midi2_per_note_controller(note, index, val32, channel=0, group=0):
+    # NOVIDADE: Status 0x3 (Per-Note Assignable Controller)
+    word1 = (0x4 << 28) | (group << 24) | (0x3 << 20) | (channel << 16) | (note << 8) | index
+    return UMPMessage(word1, val32)
+
+def create_midi2_note_off(note, vel16, channel=0, group=0):
+    word1 = (0x4 << 28) | (group << 24) | (0x8 << 20) | (channel << 16)
+    word2 = (note << 24) | vel16
+    return UMPMessage(word1, word2)
+(main.py:)
+import sys
+from PyQt6.QtWidgets import QApplication
+from midi_io import select_midi_input
+from gui import MainWindow
+from teste_pitch import test_pitch_bend
+
+def main():
+    port = select_midi_input()
+    if not port:
+        print("Nenhum dispositivo selecionado. Saindo...")
+        return
+
+    print("Rodar teste de unidade? (s/n)")
+    if input() == 's': test_pitch_bend()
+
+    app = QApplication(sys.argv)
+    win = MainWindow(port)
+    win.show()
+    sys.exit(app.exec())
+
+if __name__ == "__main__":
+    main()
+(gui.py:)
+from PyQt6.QtWidgets import (QMainWindow, QVBoxLayout, QWidget, QTextEdit, 
+                             QProgressBar, QLabel)
+from PyQt6.QtCore import QThread, pyqtSignal
+import converter
+import ump
+
+class MidiWorker(QThread):
+    log_signal = pyqtSignal(str)
+    pitch_signal = pyqtSignal(int)
+
+    def __init__(self, port):
+        super().__init__()
+        self.port = port
+        self.last_note = 60 # Default
+
+    def run(self):
+        for msg in self.port:
+            ump = None
+            
+            if msg.type == 'note_on' and msg.velocity > 0:
+                self.last_note = msg.note
+                v2 = converter.midi1_to_midi2_velocity(msg.velocity)
+                ump_msg = ump.create_midi2_note_on(msg.note, v2, msg.channel)
+                
+            elif msg.type == 'note_off' or (msg.type == 'note_on' and msg.velocity == 0):
+                v2 = converter.midi1_to_midi2_velocity(msg.velocity)
+                ump_msg = ump.create_midi2_note_off(msg.note, v2, msg.channel)
+                
+            elif msg.type == 'pitchwheel':
+                p32 = converter.midi1_to_midi2_pitch(msg.pitch)
+                ump_msg = ump.create_midi2_pitch_bend(p32, msg.channel)
+                self.pitch_signal.emit(int((p32 / 0xFFFFFFFF) * 100))
+
+            elif msg.type == 'control_change':
+                v32 = converter.midi1_to_midi2_32bit(msg.value)
+                ump_msg = ump.create_midi2_per_note_controller(
+                    self.last_note, msg.control, v32, msg.channel
+                )
+
+            if ump_msg:
+                self.log_signal.emit(ump_msg.display())
+
+class MainWindow(QMainWindow):
+    def __init__(self, port):
+        super().__init__()
+        self.setWindowTitle("Tradutor MIDI 2.0 - IFPB TCC")
+        self.setMinimumSize(400, 300)
+        
+        layout = QVBoxLayout()
+        self.log = QTextEdit(readOnly=True)
+        self.bar = QProgressBar()
+        
+        layout.addWidget(QLabel(f"Porta: {port.name}"))
+        layout.addWidget(QLabel("Resolução Pitch Bend (32-bit):"))
+        layout.addWidget(self.bar)
+        layout.addWidget(self.log)
+        
+        container = QWidget()
+        container.setLayout(layout)
+        self.setCentralWidget(container)
+
+        self.worker = MidiWorker(port)
+        self.worker.log_signal.connect(self.log.append)
+        self.worker.pitch_signal.connect(self.bar.setValue)
+        self.worker.start()
+(midi_io.py:)
+import mido
+
+def select_midi_input():
+    inputs = mido.get_input_names()
+    if not inputs: return None
+    
+    print("\n--- Entradas Disponíveis ---")
+    for i, name in enumerate(inputs):
+        print(f"{i}: {name}")
+    
+    try:
+        choice = int(input("Escolha o número da porta: "))
+        return mido.open_input(inputs[choice])
+    except (ValueError, IndexError):
+        print("Seleção inválida.")
+        return None
