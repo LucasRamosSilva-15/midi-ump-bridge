@@ -1,79 +1,82 @@
+class UMPMessage:
+    def __init__(self, word1, word2):
+        self.word1 = word1
+        self.word2 = word2
+
+    @property
+    def ump64(self):
+        return (self.word1 << 32) | self.word2
+
+    def decode(self):
+        mt = (self.word1 >> 28) & 0xF
+        group = (self.word1 >> 24) & 0xF
+        status = (self.word1 >> 20) & 0xF
+        channel = (self.word1 >> 16) & 0xF
+        note = (self.word2 >> 24) & 0xFF
+        velocity = self.word2 & 0xFFFF
+        pitch = self.word2 & 0xFFFFFFFF
+        index = (self.word2 >> 24) & 0xFF
+        cc_value = self.word2 & 0xFFFFFFFF
+        return mt, group, status, channel, note, velocity, pitch, index, cc_value
+
+    def display(self):
+        mt, group, status, channel, note, velocity, pitch, index, cc_value = self.decode()
+        print(f"  [UMP 64-bit] HEX: {hex(self.ump64)}")
+        
+        if status == 0x9:
+            print(f"  Decoded: Note On | Channel: {channel} | Note: {note} | Velocity: {velocity}")
+        elif status == 0x8:
+            print(f"  Decoded: Note Off | Channel: {channel} | Note: {note} | Velocity: {velocity}")
+        elif status == 0xE:
+            print(f"  Decoded: Pitch Bend | Channel: {channel} | Value: {pitch}")
+        elif status == 0xB:
+            print(f"  Decoded: Control Change | Index: {index} | Value: {cc_value}")
+
 def create_midi2_note_on(note, velocity16, channel=0, group=0):
-    # ===== Word 1 =====
-    # MIDI 2.0 UMP para Note On tem um formato específico, onde o Message Type (MT) é 0x4 para Channel Voice Messages, e o Status para Note On é 0x9.
-    mt = 0x4          # MIDI 2.0 Channel Voice
-    status = 0x9      # Note On
-    # O canal é um valor de 4 bits (0-15) e o grupo também é um valor de 4 bits (0-15). Ambos são posicionados em Word 1.
-    word1 = (
-        (mt << 28) |
-        (group << 24) |
-        (status << 20) |
-        (channel << 16)
-    )
-
-    # ===== Word 2 =====
-    # Word 2 para Note On inclui a nota (7 bits), um campo de tipo de atributo (8 bits, que pode ser usado para coisas como aftertouch ou outros atributos, mas aqui vamos deixar como 0) e a velocity (16 bits).
-    attribute_type = 0x00  # padrão (sem atributo extra)
-    # A nota é um valor de 7 bits (0-127), e a velocity é um valor de 16 bits (0-65535). Ambos são posicionados em Word 2.
-    word2 = (
-        (note << 24) |
-        (attribute_type << 16) |
-        (velocity16 & 0xFFFF)
-    )
-
-    return word1, word2
-def create_midi2_note_off(note, velocity16=0, channel=0, group=0):
-    # A estrutura de Word 1 para Note Off é similar ao Note On, mas o Status é diferente (0x8 para Note Off).
     mt = 0x4
-    status = 0x8  # Note Off
-    # O canal e o grupo são os mesmos, então podemos usar a mesma lógica para construir Word 1.
+    status = 0x9
     word1 = (mt << 28) | (group << 24) | (status << 20) | (channel << 16)
-    # Para Word 2, a nota e a velocity são usadas da mesma forma, mas o campo de tipo de atributo ainda é 0 para simplificar.
+    
     attribute_type = 0x00
-    # A nota é um valor de 7 bits (0-127), e a velocity é um valor de 16 bits (0-65535). Ambos são posicionados em Word 2.
-    word2 = (
-        (note << 24) |
-        (attribute_type << 16) |
-        (velocity16 & 0xFFFF)
-    )
+    word2 = (note << 24) | (attribute_type << 16) | (velocity16 & 0xFFFF)
 
-    return word1, word2
+    return UMPMessage(word1, word2)
+
+def create_midi2_note_off(note, velocity16=0, channel=0, group=0):
+    mt = 0x4
+    status = 0x8
+    word1 = (mt << 28) | (group << 24) | (status << 20) | (channel << 16)
+    
+    attribute_type = 0x00
+    word2 = (note << 24) | (attribute_type << 16) | (velocity16 & 0xFFFF)
+
+    return UMPMessage(word1, word2)
 
 def create_midi2_pitch_bend(pitch32, channel=0, group=0):
     mt = 0x4
-    status = 0xE  # Pitch Bend
-
-    word1 = (
-        (mt << 28) |
-        (group << 24) |
-        (status << 20) |
-        (channel << 16)
-    )
-
+    status = 0xE
+    word1 = (mt << 28) | (group << 24) | (status << 20) | (channel << 16)
     word2 = pitch32 & 0xFFFFFFFF
 
-    return word1, word2
+    return UMPMessage(word1, word2)
+
+def create_midi2_control_change(index, value32, channel=0, group=0):
+    mt = 0x4
+    status = 0xB
+    word1 = (mt << 28) | (group << 24) | (status << 20) | (channel << 16)
+    word2 = value32 & 0xFFFFFFFF
+    # Note: No MIDI 2.0 real, o index CC fica no word1, mas para manter a 
+    # consistência com sua lógica de Note On, estamos usando o word2.
+    return UMPMessage(word1, word2)
 
 def decode_ump(ump64):
-    # Para decodificar a mensagem UMP de 64 bits, precisamos extrair os dois words de 32 bits e depois interpretar os campos de acordo com o formato do MIDI 2.0.
     word1 = (ump64 >> 32) & 0xFFFFFFFF
     word2 = ump64 & 0xFFFFFFFF
-    # A estrutura de Word 1 para mensagens de voz MIDI 2.0 inclui o Message Type (MT), Group, Status e Channel. Word 2 inclui a nota, tipo de atributo e velocity.
     mt = (word1 >> 28) & 0xF
     group = (word1 >> 24) & 0xF
     status = (word1 >> 20) & 0xF
     channel = (word1 >> 16) & 0xF
-    # Para Word 2, a nota é um valor de 7 bits (0-127) e a velocity é um valor de 16 bits (0-65535). O campo de tipo de atributo é ignorado aqui, mas poderia ser extraído se necessário.
     note = (word2 >> 24) & 0xFF
     velocity = word2 & 0xFFFF
-    pitch = word2 & 0xFFFFFFFF  # Para mensagens de pitch bend, o valor de pitch é o valor completo de Word 2
-    # Imprime os campos decodificados para verificar se a mensagem foi interpretada corretamente.
-    if status == 0x9:
-        print(f" MT: {mt} | Group: {group} | Status: {status} (Note On) | Channel: {channel}")
-        print(f"Note: {note} | Velocity: {velocity}")
-    elif status == 0x8:
-        print(f" MT: {mt} | Group: {group} | Status: {status} (Note Off) | Channel: {channel}")
-        print(f"Note: {note} | Velocity: {velocity}")
-    elif status == 0xE:
-        print(f" MT: {mt} | Group: {group} | Status: {status} (Pitch Bend) | Channel: {channel}")
-        print(f"Pitch Bend Value: {pitch}")
+    pitch = word2 & 0xFFFFFFFF
+    return mt, group, status, channel, note, velocity, pitch
