@@ -104,19 +104,24 @@ Bash
 python main.py
 O terminal exibirá os dispositivos detectados. Digite o número da sua porta e pressione Enter. A interface gráfica será aberta e começará a escutar os eventos em tempo real.
 ```
+---
 
-🧪 Testes de Validação
+## 🧪 Testes de Validação
 O projeto inclui rotinas de validação baseadas nas especificações oficiais. Ao iniciar o main.py, o sistema perguntará se você deseja rodar o teste de unidade de Pitch Bend.
 
 Este teste injeta o valor 0 (centro perfeito de repouso no MIDI 1.0) e valida se a matemática do converter.py e o encapsulador do ump.py geram exatamente o código Hexadecimal 0x80000000, conforme exigido pelo padrão UMP.
 
-🎹 Equipamento de Teste
+---
+
+## 🎹 Equipamento de Teste
 Durante o desenvolvimento deste TCC, o software foi homologado utilizando os seguintes hardwares/softwares:
 
 Teclado físico: Yamaha PSR E383 (via USB-MIDI).
 
 Controlador Virtual: VMPK (Virtual MIDI Piano Keyboard).
 
-👤 Autor
+---
+
+## 👤 Autor
 Lucas Ramos Silva
 Projeto desenvolvido como requisito para conclusão do curso técnico em informática no Instituto Federal da Paraíba (IFPB) 2026 - Campus Campina Grande.
