@@ -47,8 +47,7 @@ Este projeto implementa na prática a diretriz de retrocompatibilidade da *MIDI 
 
 ## 📸 Demonstração Visual
 
-[Interface Principal]
-https://github.com/LucasRamosSilva-15/programa-tcc-midi/blob/master/capturas/Captura%20de%20tela%202026-04-17%20154643.png
+![Interface Principal](capturas/Captura de tela 2026-04-17 154643.png)
 
 > *Interface gráfica processando eventos MIDI em tempo real, exibindo os dados originais (MIDI 1.0) lado a lado com os pacotes convertidos (UMP 64-bit).*
 
