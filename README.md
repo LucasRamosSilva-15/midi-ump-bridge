@@ -97,6 +97,7 @@ No VMPK, vá em Edit > MIDI Connections e defina a saída (MIDI OUT) para a port
 Bash
 python main.py
 O terminal exibirá os dispositivos detectados. Digite o número da sua porta e pressione Enter. A interface gráfica será aberta e começará a escutar os eventos em tempo real.
+```
 
 🧪 Testes de Validação
 O projeto inclui rotinas de validação baseadas nas especificações oficiais. Ao iniciar o main.py, o sistema perguntará se você deseja rodar o teste de unidade de Pitch Bend.
