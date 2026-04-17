@@ -15,7 +15,7 @@ Implementar e demonstrar a lógica de conversão entre os padrões MIDI 1.0 e MI
 
 ## Justificativa
 
-Embora o padrão MIDI 2.0 já defina mecanismos de compatibilidade com MIDI 1.0, sua implementação prática não é trivial. Este projeto busca demonstra esse processo de forma clara, servindo como ferramenta de estudo e análise do protocolo.
+Embora o padrão MIDI 2.0 já defina mecanismos de compatibilidade com MIDI 1.0, sua implementação prática não é trivial. Este projeto busca demonstrar esse processo de forma clara, servindo como ferramenta de estudo e análise do protocolo.
 
 ## Funcionalidades
 
@@ -30,15 +30,13 @@ Embora o padrão MIDI 2.0 já defina mecanismos de compatibilidade com MIDI 1.0,
 
 - Python
 - Biblioteca Mido
+- PyQt6 para Interface Gráfica
   
 ## Equipamento utilizado
 
-- Teclado Arranjador Yamanha Psr E383
-
-## Observação
-
-O MIDI 2.0 mantém compatibilidade com o MIDI 1.0 por meio do formato UMP, permitindo a adaptação entre os dois padrões com maior precisão e expressividade.
+- Teclado Arranjador Yamaha PSR E383
+- Virtual MIDI Piano Keyboard (VMPK) para testes virtuais
 
 ## Autor
 
-Lucas Ramos Silva
+- Lucas Ramos Silva

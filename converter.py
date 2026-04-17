@@ -3,7 +3,7 @@ def midi1_to_midi2_velocity(v: int) -> int:
 
 def midi1_to_midi2_pitch(pitch14: int) -> int:
     pitch14_unsigned = pitch14 + 8192
-    return int((pitch14_unsigned / 16383) * 0xFFFFFFFF)
+    return pitch14_unsigned << 18
 
 def midi1_to_midi2_32bit(value7: int) -> int:
     return int((value7 / 127) * 0xFFFFFFFF)
