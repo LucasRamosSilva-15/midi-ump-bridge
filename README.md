@@ -4,8 +4,8 @@ Bem-vindo ao repositório do meu Trabalho de Conclusão de Curso (TCC) desenvolv
 
 Este projeto é uma prova de conceito (PoC) em software que captura mensagens de hardware baseadas no protocolo MIDI 1.0 (1983), realiza a conversão matemática de suas resoluções e encapsula os dados no novo padrão de alta definição **MIDI 2.0 Universal MIDI Packet (UMP)** de 64-bits.
 
-**🌟 Assista à demonstração do sistema em tempo real: [Link para o Vídeo no YouTube/Drive]**
-
+**🌟 Assista à demonstração do sistema em tempo real: [Link para o Vídeo no Drive]**
+https://drive.google.com/file/d/1H6ohKt_WSJDnULlyPFCkz695N9uzl6px/view?usp=drive_link
 ---
 
 ## 📋 Sumário
