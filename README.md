@@ -47,7 +47,9 @@ Este projeto implementa na prática a diretriz de retrocompatibilidade da *MIDI 
 
 ## 📸 Demonstração Visual
 
-![Interface Principal](![alt text](capturas/CapturaDeTela1.png))
+![alt text](capturas/CapturaDeTela1.png)
+
+![alt text](capturas/CapturaDeTela2.png)
 
 > *Interface gráfica processando eventos MIDI em tempo real, exibindo os dados originais (MIDI 1.0) lado a lado com os pacotes convertidos (UMP 64-bit).*
 
