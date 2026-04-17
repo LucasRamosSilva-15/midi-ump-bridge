@@ -9,7 +9,7 @@ https://drive.google.com/file/d/1H6ohKt_WSJDnULlyPFCkz695N9uzl6px/view?usp=drive
 ---
 
 ## 📋 Sumário
-
+- [🎵 O que é MIDI?](#-o-que-é-midi)
 - [🎯 Sobre o Projeto](#-sobre-o-projeto)
 - [🚀 Tecnologias Utilizadas](#-tecnologias-utilizadas)
 - [📸 Demonstração Visual](#-demonstração-visual)
@@ -19,6 +19,20 @@ https://drive.google.com/file/d/1H6ohKt_WSJDnULlyPFCkz695N9uzl6px/view?usp=drive
 - [🎹 Equipamento de Teste](#-equipamento-de-teste)
 - [📝 Padrão de Commits](#-padrão-de-commits)
 - [👤 Autor](#-autor)
+
+---
+
+## 🎵 O que é MIDI?
+
+Se você não é da área de tecnologia musical, pode estar se perguntando o que exatamente esse sistema faz e por que ele precisa ser convertido. A regra de ouro para entender o MIDI (*Musical Instrument Digital Interface*) é: **MIDI não é áudio, é partitura digital.**
+
+Diferente de um arquivo MP3 ou WAV, que gravam a "onda sonora" real de uma música, o protocolo MIDI transmite apenas **instruções matemáticas**. Quando um músico aperta uma tecla em um teclado físico, em vez de enviar o som pronto para o computador, o teclado envia dados como:
+
+* **Qual nota foi tocada?** (Ex: Dó)
+* **Com que força a tecla foi pressionada?** (Velocidade)
+* **Quando ela foi solta?** * **O músico usou alguma alavanca de efeito?** (*Pitch Bend*)
+
+O computador (ou sintetizador) lê essas instruções e "toca" os instrumentos virtuais na hora.
 
 ---
 
