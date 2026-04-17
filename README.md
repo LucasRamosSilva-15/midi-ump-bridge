@@ -124,4 +124,5 @@ Controlador Virtual: VMPK (Virtual MIDI Piano Keyboard).
 
 ## 👤 Autor
 Lucas Ramos Silva
+
 Projeto desenvolvido como requisito para conclusão do curso técnico em informática no Instituto Federal da Paraíba (IFPB) 2026 - Campus Campina Grande.
