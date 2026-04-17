@@ -85,20 +85,16 @@ class MainWindow(QMainWindow):
         self.worker.pitch_signal.connect(self.bar.setValue)
         self.worker.start()
 
-    # NOVO: Função que injeta uma mensagem falsa diretamente na interface
     def simular_pitch_bend(self):
-        val_midi1 = 2000 # Valor fixo de teste do seu teste_pitch.py
+        val_midi1 = 2000
         p32 = converter.midi1_to_midi2_pitch(val_midi1)
         ump_msg = ump.create_midi2_pitch_bend(p32, 0)
         
-        # 1. Atualiza a barra de progresso manualmente
         self.bar.setValue(int((p32 / 0xFFFFFFFF) * 100))
         
-        # 2. Formata a mensagem para a tabela
         data = ump_msg.analyze()
         data["original"] = f"Pitch: {val_midi1} (Simulado)"
         
-        # 3. Manda para a tabela
         self.add_table_row(data)
 
     def add_table_row(self, data):
