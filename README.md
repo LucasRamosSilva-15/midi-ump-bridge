@@ -68,7 +68,10 @@ O código foi modularizado aplicando o princípio de responsabilidade única (SR
 ├── teste_pitch.py   # Script de Prova de Conceito (PoC) e testes unitários
 └── README.md        # Documentação do projeto
 ```
-💻 Guia de Execução (Windows 11)
+
+---
+
+## 💻 Guia de Execução (Windows 11)
 Para testar o projeto localmente (mesmo sem um teclado físico), siga o passo a passo de configuração do ambiente virtual:
 ```text
 1. Preparação do Ambiente
