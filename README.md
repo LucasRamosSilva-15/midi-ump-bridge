@@ -1,4 +1,4 @@
-# 🎹 Conversor e Analisador MIDI 1.0 para MIDI 2.0 (UMP)
+# 🎹 Conversor e Analisador MIDI 1.0 para MIDI 2.0 em tempo real (UMP)
 
 Bem-vindo ao repositório do meu Trabalho de Conclusão de Curso (TCC) desenvolvido no **Instituto Federal da Paraíba (IFPB)**. 
 
