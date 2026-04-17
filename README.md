@@ -56,7 +56,7 @@ Este projeto implementa na prática a diretriz de retrocompatibilidade da *MIDI 
 ## 🛠️ Arquitetura e Estrutura do Projeto
 
 O código foi modularizado aplicando o princípio de responsabilidade única (SRP) para facilitar a manutenção e avaliação acadêmica:
-
+```text
 /
 ├── main.py          # Ponto de entrada, inicialização e injeção de dependências
 ├── gui.py           # Interface gráfica PyQt6, tabelas e Threads de escuta
