@@ -140,3 +140,11 @@ Controlador Virtual: VMPK (Virtual MIDI Piano Keyboard).
 Lucas Ramos Silva
 
 Projeto desenvolvido como requisito para conclusão do curso técnico em informática no Instituto Federal da Paraíba (IFPB) 2026 - Campus Campina Grande.
+
+---
+
+## Obs
+
+O programa possui uma versão mais recente em c++
+https://github.com/LucasRamosSilva-15/midi_ump_bridge_cpp
+
