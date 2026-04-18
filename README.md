@@ -91,10 +91,10 @@ Para testar o projeto localmente (mesmo sem um teclado físico), siga o passo a 
 1. Preparação do Ambiente
 Bash
 # Clone o repositório
-git clone https://github.com/LucasRamosSilva-15/programa-tcc-midi.git
+git clone https://github.com/LucasRamosSilva-15/midi-ump-bridge.git
 
 # Entre na pasta do projeto
-cd programa-tcc-midi
+cd midi-ump-bridge
 
 # Crie um ambiente virtual
 python -m venv venv
