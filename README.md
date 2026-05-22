@@ -1,28 +1,42 @@
-# 🎹 Conversor e Analisador MIDI 1.0 para MIDI 2.0 (UMP)
+# 🎹 Conversor e Analisador MIDI 1.0 para MIDI 2.0 em tempo real (UMP)
 
 Bem-vindo ao repositório do meu Trabalho de Conclusão de Curso (TCC) desenvolvido no **Instituto Federal da Paraíba (IFPB)**. 
 
 Este projeto é uma prova de conceito (PoC) em software que captura mensagens de hardware baseadas no protocolo MIDI 1.0 (1983), realiza a conversão matemática de suas resoluções e encapsula os dados no novo padrão de alta definição **MIDI 2.0 Universal MIDI Packet (UMP)** de 64-bits.
 
-**🌟 Assista à demonstração do sistema em tempo real: [Link para o Vídeo no Drive]**
+** Assista à demonstração do sistema em tempo real: [Link para o Vídeo no Drive]**
 https://drive.google.com/file/d/1H6ohKt_WSJDnULlyPFCkz695N9uzl6px/view?usp=drive_link
 ---
 
-## 📋 Sumário
-
-- [🎯 Sobre o Projeto](#-sobre-o-projeto)
-- [🚀 Tecnologias Utilizadas](#-tecnologias-utilizadas)
-- [📸 Demonstração Visual](#-demonstração-visual)
-- [🛠️ Arquitetura e Estrutura do Projeto](#️-arquitetura-e-estrutura-do-projeto)
-- [💻 Guia de Execução (Windows 11)](#-guia-de-execução-windows-11)
-- [🧪 Testes de Validação](#-testes-de-validação)
-- [🎹 Equipamento de Teste](#-equipamento-de-teste)
-- [📝 Padrão de Commits](#-padrão-de-commits)
-- [👤 Autor](#-autor)
+## Sumário
+- [O que é MIDI?](#-o-que-é-midi)
+- [Sobre o Projeto](#-sobre-o-projeto)
+- [Tecnologias Utilizadas](#-tecnologias-utilizadas)
+- [Demonstração Visual](#-demonstração-visual)
+- [Arquitetura e Estrutura do Projeto](#️-arquitetura-e-estrutura-do-projeto)
+- [Guia de Execução (Windows 11)](#-guia-de-execução-windows-11)
+- [Testes de Validação](#-testes-de-validação)
+- [Equipamento de Teste](#-equipamento-de-teste)
+- [Padrão de Commits](#-padrão-de-commits)
+- [Autor](#-autor)
 
 ---
 
-## 🎯 Sobre o Projeto
+## O que é MIDI?
+
+Se você não é da área de tecnologia musical, pode estar se perguntando o que exatamente esse sistema faz e por que ele precisa ser convertido. Uma boa regra para entender o MIDI (*Musical Instrument Digital Interface*) é: **MIDI não é áudio, é partitura digital.**
+
+Diferente de um arquivo MP3 ou WAV, que gravam a "onda sonora" real de uma música, o protocolo MIDI transmite apenas **instruções matemáticas**. Quando um músico aperta uma tecla em um teclado físico, em vez de enviar o som pronto para o computador, o teclado envia dados como:
+
+* **Qual nota foi tocada?** (que é indicado pela numeração da nota do teclado, por exemplo, 51)
+* **Com que força a tecla foi pressionada?** (Velocity, que é a intensidade que aquela nota foi tocada)
+* **Quando ela foi solta?** * **O músico usou alguma alavanca de efeito?** (Pitch Bend, que é usado para alterar a afinação (pitch) de uma nota de forma contínua e temporária)
+
+O computador (ou sintetizador) lê essas instruções e "toca" os instrumentos virtuais na hora.
+
+---
+
+## Sobre o Projeto
 
 ### O Desafio
 O protocolo MIDI 1.0 domina a indústria musical há mais de 40 anos operando com limitações drásticas de resolução (geralmente 7 bits, permitindo apenas valores de 0 a 127). O futuro pertence ao **MIDI 2.0**, que traz resoluções de 16 e 32 bits, eliminando o "efeito escada" (*zipper noise*) em modulações de áudio. 
@@ -36,7 +50,7 @@ Este projeto implementa na prática a diretriz de retrocompatibilidade da *MIDI 
 
 ---
 
-## 🚀 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **[Python 3.10+](https://www.python.org/)**: Linguagem base do projeto.
 - **[PyQt6](https://riverbankcomputing.com/software/pyqt/)**: Framework para a construção da Interface Gráfica (GUI) reativa e uso de *Multithreading*.
@@ -45,7 +59,7 @@ Este projeto implementa na prática a diretriz de retrocompatibilidade da *MIDI 
 
 ---
 
-## 📸 Demonstração Visual
+## Demonstração Visual
 
 ![alt text](capturas/CapturaDeTela1.png)
 
@@ -55,7 +69,7 @@ Este projeto implementa na prática a diretriz de retrocompatibilidade da *MIDI 
 
 ---
 
-## 🛠️ Arquitetura e Estrutura do Projeto
+## Arquitetura e Estrutura do Projeto
 
 O código foi modularizado aplicando o princípio de responsabilidade única (SRP) para facilitar a manutenção e avaliação acadêmica:
 ```text
@@ -71,16 +85,16 @@ O código foi modularizado aplicando o princípio de responsabilidade única (SR
 
 ---
 
-## 💻 Guia de Execução (Windows 11)
+## Guia de Execução (Windows 11)
 Para testar o projeto localmente (mesmo sem um teclado físico), siga o passo a passo de configuração do ambiente virtual:
 ```text
 1. Preparação do Ambiente
 Bash
 # Clone o repositório
-git clone https://github.com/LucasRamosSilva-15/programa-tcc-midi.git
+git clone https://github.com/LucasRamosSilva-15/midi-ump-bridge.git
 
 # Entre na pasta do projeto
-cd programa-tcc-midi
+cd midi-ump-bridge
 
 # Crie um ambiente virtual
 python -m venv venv
@@ -106,14 +120,14 @@ O terminal exibirá os dispositivos detectados. Digite o número da sua porta e 
 ```
 ---
 
-## 🧪 Testes de Validação
+## Testes de Validação
 O projeto inclui rotinas de validação baseadas nas especificações oficiais. Ao iniciar o main.py, o sistema perguntará se você deseja rodar o teste de unidade de Pitch Bend.
 
 Este teste injeta o valor 0 (centro perfeito de repouso no MIDI 1.0) e valida se a matemática do converter.py e o encapsulador do ump.py geram exatamente o código Hexadecimal 0x80000000, conforme exigido pelo padrão UMP.
 
 ---
 
-## 🎹 Equipamento de Teste
+## Equipamento de Teste
 Durante o desenvolvimento deste TCC, o software foi homologado utilizando os seguintes hardwares/softwares:
 
 Teclado físico: Yamaha PSR E383 (via USB-MIDI).
@@ -122,7 +136,15 @@ Controlador Virtual: VMPK (Virtual MIDI Piano Keyboard).
 
 ---
 
-## 👤 Autor
+## Autor
 Lucas Ramos Silva
 
 Projeto desenvolvido como requisito para conclusão do curso técnico em informática no Instituto Federal da Paraíba (IFPB) 2026 - Campus Campina Grande.
+
+---
+
+## Obs
+
+O programa possui uma versão mais recente em c++
+https://github.com/LucasRamosSilva-15/midi_ump_bridge_cpp
+
